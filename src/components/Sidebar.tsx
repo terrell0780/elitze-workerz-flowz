@@ -46,8 +46,8 @@ export default function Sidebar({ currentPage, onNavigate, isDark, onToggleTheme
             </div>
           </div>
           <div>
-            <div className={`font-bold ${textPrimary} tracking-tight`}>Workforce Hub</div>
-            <div className={`text-[10px] ${textMuted} tracking-widest uppercase`}>AI Platform</div>
+            <div className={`font-bold ${textPrimary} tracking-tight`}>Elitze WorkerzNow</div>
+            <div className={`text-[10px] ${textMuted} tracking-widest uppercase`}>AI Workforce</div>
           </div>
         </div>
       </div>

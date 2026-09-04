@@ -86,7 +86,7 @@ export function createApp(): Express {
 
   app.get('/', (_req, res) => {
     res.json({
-      service: 'zevanto-api',
+      service: 'workerznow-api',
       version: env.APP_VERSION,
       docs: '/health',
       api: '/api/v1',

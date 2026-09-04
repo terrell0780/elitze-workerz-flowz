@@ -1,9 +1,9 @@
 {
-  "name": "zevanto",
+  "name": "elitze-workerznow",
   "private": true,
   "version": "0.1.0",
   "type": "module",
-  "description": "Zevanto — autonomous AI workforce platform (React client + Node API)",
+  "description": "Elitze WorkerzNow — autonomous AI workforce platform (React client + Node API)",
   "license": "UNLICENSED",
   "engines": {
     "node": ">=22.0.0"

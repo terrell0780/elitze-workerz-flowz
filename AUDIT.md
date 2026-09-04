@@ -1,4 +1,4 @@
-# Full-Stack Production Readiness Audit - Zevanto
+# Full-Stack Production Readiness Audit - Elitze WorkerzNow
 
 **Audit date:** 2026-09-04
 **Branch:** `arena/01a06d92-zevanto`
@@ -108,7 +108,7 @@ Severities: **Critical** = blocks launch or leaks a credential; **High** = broke
 | A11Y-02 | Medium   | A11Y         | No skip link, no `aria-current`, no route announcement                   | Fixed        |
 | A11Y-03 | Low      | A11Y         | Decorative graphics and icon-only controls unlabelled                    | Partly fixed |
 | SEO-01  | Medium   | SEO          | Per-page metadata applied client-side only - crawlers see one page       | Open (P1)    |
-| SEO-02  | Low      | SEO          | Brand mismatch: `WorkerzNow` vs `Workforce Hub` vs `Zevanto`             | Flagged      |
+| SEO-02  | Low      | SEO          | Brand mismatch: `WorkerzNow` vs `Workforce Hub` vs `Zevanto`             | Fixed        |
 | SEO-03  | Low      | SEO          | No `robots.txt`, `sitemap.xml` or `og:image`                             | Flagged      |
 | OPS-01  | Medium   | Ops          | No `.gitignore`, README or LICENSE                                       | Partly fixed |
 | OPS-02  | Medium   | Ops          | Placeholder package name/version, no `engines`                           | Fixed        |
@@ -304,7 +304,7 @@ Two tests were written specifically to catch the data bugs from section 4.2, and
 ### P1 - soon after launch
 
 5. **SEO (SEO-01).** Per-page metadata is applied client-side, so crawlers only ever see the dashboard's tags. Pre-render the marketing routes or move to SSR (React Router 7 / Next / Vite SSR). Add `robots.txt`, `sitemap.xml` and an `og:image`.
-6. **Brand consistency (SEO-02).** `index.html` says *WorkerzNow*, the sidebar says *Workforce Hub*, the repo is *Zevanto*. Pick one and apply it across metadata, UI and structured data.
+6. **~~Brand consistency (SEO-02).~~** Resolved after the audit: the product is now **Elitze WorkerzNow** everywhere - `index.html` metadata and JSON-LD, all 11 route titles in `src/data/seo.ts`, the sidebar wordmark, the loading splash, the npm package name, the API service id, the log prefix, the database filename and the Docker image/volume. The GitHub repository and branch keep their existing names; renaming those is a GitHub-side action.
 7. **Query caching.** `useResource` is a deliberate minimal abstraction. TanStack Query would add cache invalidation, retries with backoff and optimistic updates for the deploy flow.
 8. **Alerting.** `/health/ready` exists but nothing watches it. Wire it to uptime monitoring and ship logs to a central backend.
 

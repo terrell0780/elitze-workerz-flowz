@@ -11,7 +11,7 @@ import type {
 } from '@shared/types';
 
 /**
- * Typed HTTP client for the Zevanto API.
+ * Typed HTTP client for the Elitze WorkerzNow API.
  *
  * Defaults to a *relative* `/api/v1` base so the app works unchanged in local
  * dev (Vite proxy), preview and production behind the same origin. Set
@@ -126,7 +126,7 @@ async function request<T>(path: string, options: RequestOptions = {}): Promise<T
 function apiErrorFrom(error: unknown): ApiError {
   if (error instanceof ApiError) return error;
   if (error instanceof TypeError) {
-    return new ApiError(0, 'NETWORK_ERROR', 'Cannot reach the Zevanto API');
+    return new ApiError(0, 'NETWORK_ERROR', 'Cannot reach the Elitze WorkerzNow API');
   }
   if (error instanceof SyntaxError) {
     return new ApiError(0, 'INVALID_JSON', 'The API returned an unreadable response');

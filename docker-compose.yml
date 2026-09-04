@@ -2,14 +2,14 @@ services:
   # Production-shaped run: API on :4000 serving the compiled client.
   api:
     build: .
-    image: zevanto:latest
+    image: elitze-workerznow:latest
     ports:
       - '4000:4000'
     environment:
       NODE_ENV: production
       PORT: 4000
       HOST: 0.0.0.0
-      DATABASE_FILE: .data/zevanto.db
+      DATABASE_FILE: .data/workerznow.db
       # Override these for any real deployment - see .env.example
       ADMIN_PIN: ${ADMIN_PIN:-1234}
       ADMIN_TOKEN_SECRET: ${ADMIN_TOKEN_SECRET:-dev-only-insecure-secret-change-me}
@@ -17,7 +17,7 @@ services:
       APP_VERSION: ${APP_VERSION:-0.1.0}
       COMMIT_SHA: ${COMMIT_SHA:-unknown}
     volumes:
-      - zevanto-data:/app/.data
+      - workerznow-data:/app/.data
     restart: unless-stopped
     healthcheck:
       test:
@@ -48,4 +48,4 @@ services:
       - api
 
 volumes:
-  zevanto-data:
+  workerznow-data:

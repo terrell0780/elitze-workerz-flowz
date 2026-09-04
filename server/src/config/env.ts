@@ -20,7 +20,7 @@ const envSchema = z.object({
   HOST: z.string().min(1).default('0.0.0.0'),
   LOG_LEVEL: z.enum(['fatal', 'error', 'warn', 'info', 'debug', 'trace', 'silent']).default('info'),
   CORS_ORIGIN: z.string().default('*'),
-  DATABASE_FILE: z.string().default('.data/zevanto.db'),
+  DATABASE_FILE: z.string().default('.data/workerznow.db'),
   SEED_DATABASE: booleanish.default(true),
 
   /** PIN gate for admin actions. Must be overridden in any deployed environment. */

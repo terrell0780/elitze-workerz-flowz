@@ -1,6 +1,6 @@
 # syntax=docker/dockerfile:1
 # ---------------------------------------------------------------------------
-# Zevanto - production image
+# Elitze WorkerzNow - production image
 #
 # The API serves the compiled client from the same origin, so a single
 # container is a complete deployment. Built on a glibc base image because

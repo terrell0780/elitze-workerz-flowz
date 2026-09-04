@@ -11,7 +11,7 @@ export const healthRouter: Router = Router();
 healthRouter.get('/', (_req, res) => {
   const body: HealthResponse = {
     status: 'ok',
-    service: 'zevanto-api',
+    service: 'workerznow-api',
     version: env.APP_VERSION,
     environment: env.NODE_ENV,
     uptimeSeconds: Math.floor((Date.now() - startedAt) / 1000),
@@ -31,7 +31,7 @@ healthRouter.get('/ready', (_req, res) => {
 
   const body: ReadinessResponse = {
     status: database === 'up' ? 'ok' : 'degraded',
-    service: 'zevanto-api',
+    service: 'workerznow-api',
     version: env.APP_VERSION,
     environment: env.NODE_ENV,
     uptimeSeconds: Math.floor((Date.now() - startedAt) / 1000),

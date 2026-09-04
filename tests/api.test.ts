@@ -9,7 +9,7 @@ const app = createApp();
 describe('health', () => {
   it('reports liveness', async () => {
     const response = await request(app).get('/health').expect(200);
-    expect(response.body).toMatchObject({ status: 'ok', service: 'zevanto-api' });
+    expect(response.body).toMatchObject({ status: 'ok', service: 'workerznow-api' });
     expect(typeof response.body.uptimeSeconds).toBe('number');
   });
 

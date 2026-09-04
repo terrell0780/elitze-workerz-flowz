@@ -1,4 +1,4 @@
-# Zevanto
+# Elitze WorkerzNow
 
 Autonomous AI-workforce platform: a React + TypeScript client and a Node/Express API sharing a single typed domain module.
 
@@ -146,7 +146,7 @@ Copy `.env.example` to `.env`. Every value is validated at boot by Zod; invalid 
 | Variable                  | Default            | Notes                                    |
 | ------------------------- | ------------------ | ---------------------------------------- |
 | `PORT` / `HOST`           | `4000` / `0.0.0.0` | API bind address                         |
-| `DATABASE_FILE`           | `.data/zevanto.db` | `:memory:` for ephemeral/test runs       |
+| `DATABASE_FILE`           | `.data/workerznow.db` | `:memory:` for ephemeral/test runs       |
 | `ADMIN_PIN`               | `1234`             | **Change before deploying**              |
 | `ADMIN_TOKEN_SECRET`      | dev default        | `openssl rand -hex 32`                   |
 | `ADMIN_TOKEN_TTL_SECONDS` | `3600`             | Admin session lifetime                   |

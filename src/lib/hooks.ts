@@ -94,7 +94,7 @@ export function useEscapeKey(active: boolean, handler: () => void): void {
   }, [active]);
 }
 
-const THEME_STORAGE_KEY = 'zevanto:theme';
+const THEME_STORAGE_KEY = 'workerznow:theme';
 
 export type ThemePreference = 'dark' | 'light';
 

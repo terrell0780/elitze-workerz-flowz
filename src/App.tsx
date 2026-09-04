@@ -313,7 +313,7 @@ function LoadingSplash() {
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
           </svg>
         </motion.div>
-        <p className="mt-6 text-lg font-medium text-slate-400">AI Workforce Hub</p>
+        <p className="mt-6 text-lg font-medium text-slate-400">Elitze WorkerzNow</p>
         <div className="mt-3 flex items-center justify-center gap-1.5">
           {[0, 1, 2].map((i) => (
             <motion.div

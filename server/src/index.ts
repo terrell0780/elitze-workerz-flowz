@@ -8,7 +8,7 @@ const app = createApp();
 const server = app.listen(env.PORT, env.HOST, () => {
   logger.info(
     { port: env.PORT, host: env.HOST, env: env.NODE_ENV, version: env.APP_VERSION },
-    'zevanto api listening',
+    'workerznow api listening',
   );
 });
 

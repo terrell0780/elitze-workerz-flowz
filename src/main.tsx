@@ -7,7 +7,7 @@ import ErrorBoundary from "./components/ErrorBoundary";
 const container = document.getElementById("root");
 
 if (!container) {
-  throw new Error('Unable to mount Zevanto: #root element is missing from index.html');
+  throw new Error('Unable to mount Elitze WorkerzNow: #root element is missing from index.html');
 }
 
 createRoot(container).render(

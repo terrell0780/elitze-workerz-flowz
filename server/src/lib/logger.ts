@@ -9,7 +9,7 @@ import { env, isTest } from '../config/env';
  */
 export const logger = pino({
   level: isTest ? 'silent' : env.LOG_LEVEL,
-  base: { service: 'zevanto-api', env: env.NODE_ENV, version: env.APP_VERSION },
+  base: { service: 'workerznow-api', env: env.NODE_ENV, version: env.APP_VERSION },
   redact: {
     paths: [
       'req.headers.authorization',

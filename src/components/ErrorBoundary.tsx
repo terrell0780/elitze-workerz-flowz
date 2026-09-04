@@ -24,7 +24,7 @@ export class ErrorBoundary extends Component<Props, State> {
   }
 
   public override componentDidCatch(error: Error, info: ErrorInfo): void {
-    console.error('[zevanto] unhandled UI error', error, info.componentStack);
+    console.error('[workerznow] unhandled UI error', error, info.componentStack);
   }
 
   private reset = (): void => {
