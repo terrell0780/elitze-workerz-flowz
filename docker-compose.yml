@@ -1,0 +1,51 @@
+services:
+  # Production-shaped run: API on :4000 serving the compiled client.
+  api:
+    build: .
+    image: zevanto:latest
+    ports:
+      - '4000:4000'
+    environment:
+      NODE_ENV: production
+      PORT: 4000
+      HOST: 0.0.0.0
+      DATABASE_FILE: .data/zevanto.db
+      # Override these for any real deployment - see .env.example
+      ADMIN_PIN: ${ADMIN_PIN:-1234}
+      ADMIN_TOKEN_SECRET: ${ADMIN_TOKEN_SECRET:-dev-only-insecure-secret-change-me}
+      CORS_ORIGIN: ${CORS_ORIGIN:-*}
+      APP_VERSION: ${APP_VERSION:-0.1.0}
+      COMMIT_SHA: ${COMMIT_SHA:-unknown}
+    volumes:
+      - zevanto-data:/app/.data
+    restart: unless-stopped
+    healthcheck:
+      test:
+        - CMD
+        - node
+        - -e
+        - "fetch('http://127.0.0.1:4000/health').then((r) => process.exit(r.ok ? 0 : 1)).catch(() => process.exit(1))"
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 15s
+
+  # Local development only: Vite dev server with HMR, proxying /api to the API.
+  #   docker compose --profile dev up web
+  web:
+    build: .
+    profiles: ['dev']
+    command: npm run dev:web
+    ports:
+      - '5173:5173'
+    environment:
+      NODE_ENV: development
+      API_PROXY_TARGET: http://api:4000
+    volumes:
+      - ./src:/app/src
+      - ./shared:/app/shared
+    depends_on:
+      - api
+
+volumes:
+  zevanto-data:
