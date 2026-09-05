@@ -2,9 +2,18 @@ import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import "./index.css";
 import App from "./App";
+import ErrorBoundary from "./components/ErrorBoundary";
 
-createRoot(document.getElementById("root")!).render(
+const container = document.getElementById("root");
+
+if (!container) {
+  throw new Error('Unable to mount Elitze WorkerzNow: #root element is missing from index.html');
+}
+
+createRoot(container).render(
   <StrictMode>
-    <App />
-  </StrictMode>
+    <ErrorBoundary>
+      <App />
+    </ErrorBoundary>
+  </StrictMode>,
 );

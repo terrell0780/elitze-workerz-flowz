@@ -1,10 +1,11 @@
 import { useState, useEffect, useRef } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 import { 
-  Bot, Send, ChevronDown, Sparkles, Wand2, Search, FileText, Mail, 
+  Bot, Send, ChevronDown, Wand2, Search, FileText, Mail, 
   Database, Calendar, MessageSquare, Brain, Workflow, Plus, Trash2,
-  CheckCircle2, GitBranch, ArrowRight, CornerDownRight, Shield
+  GitBranch, CornerDownRight, Shield
 } from 'lucide-react';
+import type { LucideIcon } from 'lucide-react';
 import PageHeader from '../components/PageHeader';
 import { pageSEO } from '../data/seo';
 
@@ -16,7 +17,7 @@ interface Tool {
   id: string;
   name: string;
   description: string;
-  icon: any;
+  icon: LucideIcon;
   category: string;
 }
 
@@ -42,7 +43,11 @@ interface ChatThread {
   selectedTool: string;
 }
 
-const modelMeta: Record<ModelName, { label: string; subtitle: string; color: string; icon: any }> = {
+/** Monotonic id source — avoids the millisecond collisions of Date.now(). */
+let idSequence = 0;
+const nextId = (prefix: string): string => `${prefix}-${(idSequence += 1)}`;
+
+const modelMeta: Record<ModelName, { label: string; subtitle: string; color: string; icon: LucideIcon }> = {
   Hermes: { label: 'Hermes', subtitle: 'Execution + Autonomous tools', color: 'from-amber-500 to-orange-500', icon: Bot },
   Lindy: { label: 'Lindy', subtitle: 'Frontline Agent + Workspace operations', color: 'from-indigo-500 to-violet-500', icon: MessageSquare },
   'ChatGPT 5.5': { label: 'ChatGPT 5.5', subtitle: 'Strategy + Complex reasoning', color: 'from-cyan-500 to-blue-500', icon: Brain },
@@ -113,11 +118,8 @@ export default function ChatSystemPage({ isDark }: Props) {
   }, [activeThread?.messages, isStreaming]);
 
   const card = isDark ? 'bg-[#12121e] border-slate-800/60' : 'bg-white border-slate-200/60 shadow-sm';
-  const textP = isDark ? 'text-white' : 'text-slate-900';
-  const textS = isDark ? 'text-slate-400' : 'text-slate-500';
   const textM = isDark ? 'text-slate-500' : 'text-slate-400';
   const border = isDark ? 'border-slate-800/60' : 'border-slate-100';
-  const inputCls = isDark ? 'bg-[#0f1020] border-slate-700 text-white placeholder-slate-500' : 'bg-slate-50 border-slate-200 text-slate-700';
 
   const handleModelChange = (model: ModelName) => {
     setThreads(prev => prev.map(t => t.id === activeThreadId ? { ...t, selectedModel: model } : t));
@@ -129,14 +131,14 @@ export default function ChatSystemPage({ isDark }: Props) {
 
   const createNewThread = () => {
     const newThread: ChatThread = {
-      id: Date.now().toString(),
+      id: nextId('thread'),
       title: 'New Conversation',
       timestamp: 'Just now',
       selectedModel: 'Hermes',
       selectedTool: 'auto',
       messages: [
         {
-          id: Date.now().toString() + '-init',
+          id: nextId('msg'),
           role: 'assistant',
           model: 'Hermes',
           content: 'Command center active. Specify a task, and I will decompose it via LangGraph and deploy the appropriate worker tiers. You can also switch to Lindy for frontline ops or ChatGPT 5.5 for strategy.',
@@ -153,14 +155,14 @@ export default function ChatSystemPage({ isDark }: Props) {
     const remaining = threads.filter(t => t.id !== id);
     if (remaining.length === 0) {
       const newThread: ChatThread = {
-        id: Date.now().toString(),
+        id: nextId('thread'),
         title: 'New Conversation',
         timestamp: 'Just now',
         selectedModel: 'Hermes',
         selectedTool: 'auto',
         messages: [
           {
-            id: Date.now().toString() + '-init',
+            id: nextId('msg'),
             role: 'assistant',
             model: 'Hermes',
             content: 'Command center active. Specify a task, and I will decompose it via LangGraph and deploy the appropriate worker tiers. You can also switch to Lindy for frontline ops or ChatGPT 5.5 for strategy.',
@@ -182,7 +184,7 @@ export default function ChatSystemPage({ isDark }: Props) {
     if (!input.trim() || isStreaming) return;
 
     const userMsg: ChatMessage = {
-      id: Date.now().toString(),
+      id: nextId('thread'),
       role: 'user',
       content: input,
       timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
@@ -248,7 +250,7 @@ export default function ChatSystemPage({ isDark }: Props) {
         }
 
         const assistantMsg: ChatMessage = {
-          id: (Date.now() + 1).toString(),
+          id: nextId('msg'),
           role: 'assistant',
           model: activeModel,
           content: responseText,
@@ -373,7 +375,7 @@ export default function ChatSystemPage({ isDark }: Props) {
 
           {/* Conversation viewport */}
           <div className="flex-1 p-6 overflow-y-auto space-y-6">
-            {activeThread.messages.map((message, idx) => {
+            {activeThread.messages.map((message) => {
               const isAssistant = message.role === 'assistant';
               return (
                 <div key={message.id}>

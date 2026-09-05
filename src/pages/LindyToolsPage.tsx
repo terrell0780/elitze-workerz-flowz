@@ -55,7 +55,6 @@ export default function LindyToolsPage({ isDark }: Props) {
   const textP = isDark ? 'text-white' : 'text-slate-900';
   const textS = isDark ? 'text-slate-400' : 'text-slate-500';
   const textM = isDark ? 'text-slate-500' : 'text-slate-400';
-  const border = isDark ? 'border-slate-800/60' : 'border-slate-100';
 
   return (
     <div className="min-h-screen p-8">

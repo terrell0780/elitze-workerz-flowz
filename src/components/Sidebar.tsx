@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion';
-import { PageType } from '../App';
+import type { PageType } from '../App';
 import { LayoutDashboard, Users, Rocket, BarChart3, CreditCard, GitBranch, Plug, Settings, Sparkles, ChevronRight, Layers, Sun, Moon, Search, Lock, MessagesSquare, Workflow } from 'lucide-react';
 
 interface SidebarProps {
@@ -46,8 +46,8 @@ export default function Sidebar({ currentPage, onNavigate, isDark, onToggleTheme
             </div>
           </div>
           <div>
-            <div className={`font-bold ${textPrimary} tracking-tight`}>Workforce Hub</div>
-            <div className={`text-[10px] ${textMuted} tracking-widest uppercase`}>AI Platform</div>
+            <div className={`font-bold ${textPrimary} tracking-tight`}>Elitze WorkerzNow</div>
+            <div className={`text-[10px] ${textMuted} tracking-widest uppercase`}>AI Workforce</div>
           </div>
         </div>
       </div>
@@ -71,12 +71,14 @@ export default function Sidebar({ currentPage, onNavigate, isDark, onToggleTheme
       </div>
 
       {/* Navigation */}
-      <nav className="flex-1 px-3 py-2 overflow-y-auto">
+      <nav className="flex-1 px-3 py-2 overflow-y-auto" aria-label="Primary">
         <div className="space-y-0.5">
           {navItems.map((item) => (
             <motion.button
               key={item.id}
+              type="button"
               onClick={() => onNavigate(item.id)}
+              aria-current={currentPage === item.id ? 'page' : undefined}
               className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all relative ${currentPage === item.id ? activeText : inactiveText}`}
               whileTap={{ scale: 0.97 }}
             >
