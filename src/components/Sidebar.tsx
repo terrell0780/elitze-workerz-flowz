@@ -1,127 +1,229 @@
-import { motion } from 'framer-motion';
-import type { PageType } from '../App';
-import { LayoutDashboard, Users, Rocket, BarChart3, CreditCard, GitBranch, Plug, Settings, Sparkles, ChevronRight, Layers, Sun, Moon, Search, Lock, MessagesSquare, Workflow } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import {
+  Cpu, Home, Users, UserPlus, Layers, Workflow,
+  MessageSquare, ShoppingCart, Trophy, Shield,
+  HelpCircle, Globe, Star, Settings, ChevronLeft,
+  ChevronRight, Menu, Zap, Crown, Search, BarChart3,
+  ClipboardCheck, FileCheck2, SlidersHorizontal, Activity
+} from 'lucide-react';
+import { router, type PageId } from '../store/router';
+import { ALL_AGENTS } from '../data/allAgents';
+import { cn } from '../utils/cn';
+import { useCart } from '../store/cart';
+import { isFlashSaleActive } from '../store/flashSale';
+import { getVIPStatus } from '../store/flashSale';
+import { NavItem } from '../types/core';
 
-interface SidebarProps {
-  currentPage: PageType;
-  onNavigate: (page: PageType) => void;
-  isDark: boolean;
-  onToggleTheme: () => void;
-  onOpenSearch: () => void;
-  onOpenAdmin: () => void;
-  adminUnlocked: boolean;
-}
-
-const navItems: { id: PageType; label: string; icon: React.ReactNode }[] = [
-  { id: 'dashboard', label: 'Dashboard', icon: <LayoutDashboard className="w-[18px] h-[18px]" /> },
-  { id: 'chat', label: 'Chat System', icon: <MessagesSquare className="w-[18px] h-[18px]" /> },
-  { id: 'employees', label: 'Employees', icon: <Users className="w-[18px] h-[18px]" /> },
-  { id: 'deploy', label: 'Deploy', icon: <Rocket className="w-[18px] h-[18px]" /> },
-  { id: 'lindy-tools', label: 'Lindy Tools', icon: <Workflow className="w-[18px] h-[18px]" /> },
-  { id: 'workflows', label: 'Workflows', icon: <GitBranch className="w-[18px] h-[18px]" /> },
-  { id: 'analytics', label: 'Analytics', icon: <BarChart3 className="w-[18px] h-[18px]" /> },
-  { id: 'integrations', label: 'Integrations', icon: <Plug className="w-[18px] h-[18px]" /> },
-  { id: 'architecture', label: 'Architecture', icon: <Layers className="w-[18px] h-[18px]" /> },
-  { id: 'billing', label: 'Billing', icon: <CreditCard className="w-[18px] h-[18px]" /> },
-  { id: 'settings', label: 'Settings', icon: <Settings className="w-[18px] h-[18px]" /> },
+const NAV_ITEMS: NavItem[] = [
+  { id: 'home',         label: 'Dashboard',      icon: Home },
+  { id: 'agents',       label: 'Browse Agents',  icon: Users,       badge: '1000', badgeColor: 'bg-slate-500/20 text-slate-300' },
+  { id: 'hire',         label: 'Hire an Agent',  icon: UserPlus,    badge: 'NEW', badgeColor: 'bg-blue-500/20 text-blue-300' },
+  { id: 'hiring-guide', label: 'Hiring Guide',   icon: HelpCircle },
+  { id: 'integrations', label: 'ATS / CRM Sync', icon: Globe },
+  { id: 'analytics',    label: 'Analytics',      icon: BarChart3 },
+  { id: 'assessments',  label: 'Assessments',    icon: ClipboardCheck },
+  { id: 'onboarding',   label: 'Onboarding',     icon: FileCheck2 },
+  { id: 'controls',     label: 'Approvals',      icon: SlidersHorizontal },
+  { id: 'trust',        label: 'Trust Center',   icon: Shield },
+  { id: 'status',       label: 'Status / SLA',   icon: Activity },
+  { id: 'research',     label: 'DuckDuckGo Research', icon: Search },
+  { id: 'behavior',     label: 'Behavioral Flow',icon: Zap },
+  { id: 'orchestrator', label: 'Orchestrator',   icon: Layers,      dividerBefore: true },
+  { id: 'workflow',     label: 'Process Map',    icon: Workflow },
+  { id: 'chat',         label: 'Agent Services', icon: MessageSquare, badge: '●', badgeColor: 'text-emerald-400' },
+  { id: 'checkout',     label: 'Checkout',       icon: ShoppingCart, dividerBefore: true },
+  { id: 'leaderboard',  label: 'Top Performers', icon: Trophy },
+  { id: 'ecosystem',    label: 'Network',        icon: Globe,       dividerBefore: true },
+  { id: 'eliteze-system', label: 'ELITZE System', icon: Zap },
+  { id: 'testimonials', label: 'Case Studies',   icon: Star },
+  { id: 'security',     label: 'Compliance',     icon: Shield },
+  { id: 'faq',          label: 'Knowledge',      icon: HelpCircle },
+  { id: 'legal',        label: 'Legal & Payments', icon: Shield },
+  { id: 'admin',        label: 'Administration', icon: Settings,    dividerBefore: true },
 ];
 
-export default function Sidebar({ currentPage, onNavigate, isDark, onToggleTheme, onOpenSearch, onOpenAdmin, adminUnlocked }: SidebarProps) {
-  const bgClass = isDark ? 'bg-[#0c0c18]/95 border-slate-800/60' : 'bg-white/80 backdrop-blur-xl border-slate-200/60';
-  const textPrimary = isDark ? 'text-white' : 'text-slate-900';
-  const textMuted = isDark ? 'text-slate-500' : 'text-slate-400';
-  const activeBg = isDark ? 'bg-indigo-500/15 border-indigo-500/30' : 'bg-indigo-50 border-indigo-200';
-  const activeText = isDark ? 'text-indigo-400' : 'text-indigo-600';
-  const inactiveText = isDark ? 'text-slate-400 hover:text-slate-200' : 'text-slate-500 hover:text-slate-700';
+interface SidebarProps {
+  onCartOpen: () => void;
+}
 
-  return (
-    <motion.aside className={`fixed left-0 top-0 h-screen w-64 flex flex-col z-50 border-r ${bgClass}`} initial={{ x: -256 }} animate={{ x: 0 }} transition={{ duration: 0.4, ease: 'easeOut' }}>
+import { NotificationCenter } from './NotificationCenter';
+import { ProfileSettings } from './ProfileSettings';
+
+export function Sidebar({ onCartOpen }: SidebarProps) {
+  const [current, setCurrent] = useState<PageId>(router.current);
+  const [collapsed, setCollapsed] = useState(false);
+  const [mobileOpen, setMobileOpen] = useState(false);
+  const { items } = useCart();
+  const vip = getVIPStatus();
+  const saleActive = isFlashSaleActive();
+
+  useEffect(() => {
+    const unsub = router.subscribe(() => {
+      setCurrent(router.current);
+      setMobileOpen(false);
+    });
+    return unsub;
+  }, []);
+
+  function navigate(id: PageId) {
+    if (id === 'checkout') { onCartOpen(); return; }
+    router.go(id);
+  }
+
+  const cartCount = items.length;
+
+  const sidebar = (
+    <div className={cn(
+      'h-full flex flex-col bg-[#0a0b12] border-r border-white/5 transition-all duration-300 ease-in-out',
+      collapsed ? 'w-16' : 'w-64'
+    )}>
       {/* Logo */}
-      <div className={`h-16 flex items-center px-5 border-b ${isDark ? 'border-slate-800/60' : 'border-slate-200/60'}`}>
-        <div className="flex items-center gap-3">
-          <div className="relative">
-            <div className="absolute inset-0 bg-gradient-to-br from-indigo-500 to-violet-500 rounded-xl blur-md opacity-40" />
-            <div className="relative w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-500 to-violet-500 flex items-center justify-center shadow-lg shadow-indigo-500/25">
-              <svg className="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
+      <div className={cn('flex items-center gap-3 px-4 py-6 border-b border-white/5 flex-shrink-0', collapsed && 'justify-center px-0')}>
+        <div className="w-8 h-8 rounded-lg bg-slate-800 border border-slate-700 flex items-center justify-center flex-shrink-0 shadow-lg">
+          <Cpu className="w-4 h-4 text-slate-300" />
+        </div>
+        {!collapsed && (
+          <div className="min-w-0 flex-1">
+            <p className="text-sm font-bold text-white tracking-wide leading-tight uppercase">Elitze</p>
+            <p className="text-[9px] text-slate-500 font-mono tracking-widest">AGENCY GRADE v2.4</p>
+          </div>
+        )}
+        {!collapsed && (
+          <div className="flex items-center gap-1">
+            <NotificationCenter />
+            <ProfileSettings />
+          </div>
+        )}
+      </div>
+
+      {/* Sale/VIP Summary */}
+      {!collapsed && (saleActive || vip.active) && (
+        <div className="px-3 py-3 space-y-2 flex-shrink-0 bg-white/[0.01]">
+          {saleActive && (
+            <div className="px-3 py-2 rounded-lg bg-slate-900 border border-slate-800 flex items-center gap-2">
+              <Zap className="w-3 h-3 text-blue-400" />
+              <p className="text-[9px] font-bold text-slate-300">OPENING PROMO ACTIVE</p>
             </div>
-          </div>
-          <div>
-            <div className={`font-bold ${textPrimary} tracking-tight`}>Elitze WorkerzNow</div>
-            <div className={`text-[10px] ${textMuted} tracking-widest uppercase`}>AI Workforce</div>
-          </div>
+          )}
+          {vip.active && (
+            <div className="px-3 py-2 rounded-lg bg-slate-900 border border-slate-800 flex items-center gap-2">
+              <Crown className="w-3 h-3 text-slate-300" />
+              <p className="text-[9px] font-bold text-slate-400 uppercase tracking-tighter">VIP STATUS ACTIVE</p>
+            </div>
+          )}
         </div>
-      </div>
+      )}
 
-      {/* Executive AI Status */}
-      <div className="px-4 py-4">
-        <motion.div className={`relative overflow-hidden rounded-xl border p-4 ${isDark ? 'bg-indigo-500/10 border-indigo-500/20' : 'bg-gradient-to-br from-indigo-50 to-violet-50 border-indigo-100'}`} whileHover={{ scale: 1.01 }}>
-          <div className="flex items-center gap-2 mb-3">
-            <Sparkles className={`w-4 h-4 ${isDark ? 'text-indigo-400' : 'text-indigo-500'}`} />
-            <span className={`text-xs font-semibold ${isDark ? 'text-indigo-300' : 'text-indigo-600'}`}>Executive AI Layer</span>
-          </div>
-          <div className="flex gap-3">
-            {['ChatGPT', 'Lindy', 'Hermes'].map((ai, i) => (
-              <div key={ai} className="flex items-center gap-1.5">
-                <motion.div className="w-2 h-2 rounded-full bg-emerald-400" animate={{ opacity: [1, 0.4, 1] }} transition={{ duration: 2, delay: i * 0.3, repeat: Infinity }} />
-                <span className={`text-[11px] ${textMuted}`}>{ai}</span>
-              </div>
-            ))}
-          </div>
-        </motion.div>
-      </div>
-
-      {/* Navigation */}
-      <nav className="flex-1 px-3 py-2 overflow-y-auto" aria-label="Primary">
-        <div className="space-y-0.5">
-          {navItems.map((item) => (
-            <motion.button
-              key={item.id}
-              type="button"
-              onClick={() => onNavigate(item.id)}
-              aria-current={currentPage === item.id ? 'page' : undefined}
-              className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all relative ${currentPage === item.id ? activeText : inactiveText}`}
-              whileTap={{ scale: 0.97 }}
-            >
-              {currentPage === item.id && (
-                <motion.div className={`absolute inset-0 rounded-xl border ${activeBg}`} layoutId="activeNav" transition={{ type: 'spring', bounce: 0.15, duration: 0.4 }} />
-              )}
-              <span className="relative z-10">{item.icon}</span>
-              <span className="relative z-10 text-[13px] font-medium">{item.label}</span>
-            </motion.button>
-          ))}
-        </div>
+      {/* Main Nav */}
+      <nav className="flex-1 overflow-y-auto py-3 px-2 space-y-0.5 min-h-0 scrollbar-hide">
+        {NAV_ITEMS.map((item) => {
+          const active = current === item.id;
+          const showCart = item.id === 'checkout' && cartCount > 0;
+          return (
+            <div key={item.id}>
+              {item.dividerBefore && <div className="my-2 border-t border-white/5" />}
+              <button
+                onClick={() => navigate(item.id)}
+                className={cn(
+                  'w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all relative group',
+                  collapsed && 'justify-center px-0',
+                  active
+                    ? 'bg-slate-800/50 text-white border border-slate-700/50 shadow-sm'
+                    : 'text-slate-400 hover:text-white hover:bg-white/[0.02] border border-transparent'
+                )}
+              >
+                <item.icon className={cn('w-4 h-4 flex-shrink-0 transition-colors', active ? 'text-blue-400' : 'text-slate-500 group-hover:text-slate-300')} />
+                {!collapsed && <span className="flex-1 text-left truncate tracking-tight">{item.label}</span>}
+                {!collapsed && item.badge && (
+                  <span className={cn('text-[9px] font-bold px-1.5 py-0.5 rounded-full flex-shrink-0', item.badgeColor)}>
+                    {showCart ? cartCount : item.badge}
+                  </span>
+                )}
+                {collapsed && showCart && (
+                  <span className="absolute top-1 right-1 w-4 h-4 rounded-full bg-slate-700 text-white text-[8px] font-bold flex items-center justify-center border border-white/10 shadow-lg">
+                    {cartCount}
+                  </span>
+                )}
+                {collapsed && (
+                  <div className="absolute left-full ml-2 px-2 py-1 rounded-lg bg-[#0d0d1e] border border-white/10 text-xs text-white whitespace-nowrap opacity-0 group-hover:opacity-100 pointer-events-none z-50 transition-all shadow-2xl translate-x-2 group-hover:translate-x-0">
+                    {item.label}
+                  </div>
+                )}
+              </button>
+            </div>
+          );
+        })}
       </nav>
 
-      {/* Bottom Actions */}
-      <div className={`p-4 border-t ${isDark ? 'border-slate-800/60' : 'border-slate-200/60'}`}>
-        {/* Theme & Search */}
-        <div className="flex items-center gap-2 mb-3">
-          <motion.button onClick={onToggleTheme} className={`flex-1 flex items-center justify-center gap-2 p-2.5 rounded-xl transition-colors ${isDark ? 'bg-slate-800/80 text-slate-300 hover:bg-slate-700' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'}`} whileTap={{ scale: 0.95 }}>
-            {isDark ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
-            <span className="text-xs font-medium">{isDark ? 'Light' : 'Dark'}</span>
-          </motion.button>
-          <motion.button onClick={onOpenSearch} className={`flex-1 flex items-center justify-center gap-2 p-2.5 rounded-xl transition-colors ${isDark ? 'bg-slate-800/80 text-slate-300 hover:bg-slate-700' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'}`} whileTap={{ scale: 0.95 }}>
-            <Search className="w-4 h-4" />
-            <span className="text-xs font-medium">Search</span>
-          </motion.button>
-        </div>
-
-        {/* Admin */}
-        <motion.button onClick={onOpenAdmin} className={`w-full flex items-center gap-3 p-3 rounded-xl mb-3 transition-colors ${adminUnlocked ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' : isDark ? 'bg-slate-800/80 text-slate-300 hover:bg-slate-700' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'}`} whileHover={{ scale: 1.01 }}>
-          <Lock className="w-4 h-4" />
-          <span className="text-sm font-medium">{adminUnlocked ? 'Admin Unlocked' : 'Admin Panel'}</span>
-        </motion.button>
-
-        {/* User */}
-        <motion.div className={`flex items-center gap-3 p-3 rounded-xl cursor-pointer transition-colors ${isDark ? 'bg-slate-800/60 border border-slate-700/50 hover:bg-slate-700/60' : 'bg-slate-50 border border-slate-100 hover:bg-slate-100'}`} whileHover={{ scale: 1.01 }}>
-          <div className="w-9 h-9 rounded-full bg-gradient-to-br from-indigo-400 to-violet-400 flex items-center justify-center text-sm font-bold text-white shadow-lg shadow-indigo-500/20">JD</div>
-          <div className="flex-1 min-w-0">
-            <div className={`text-sm font-medium truncate ${textPrimary}`}>John Doe</div>
-            <div className={`text-xs ${textMuted}`}>Enterprise Plan</div>
+      {/* Agents Roster */}
+      {!collapsed && (
+        <div className="border-t border-white/5 flex-shrink-0 bg-[#080910]">
+          <div className="px-4 py-3">
+            <div className="flex items-center justify-between mb-2">
+              <p className="text-[9px] font-bold text-slate-500 uppercase tracking-widest">Active Roster</p>
+              <button onClick={() => router.go('agents')} className="text-[9px] text-blue-400/70 hover:text-blue-300 transition-colors font-mono">
+                Catalog →
+              </button>
+            </div>
+            <div className="space-y-0.5 max-h-48 overflow-y-auto pr-0.5 custom-scrollbar">
+              {ALL_AGENTS.filter(a => a.availability === 'Available').slice(0, 15).map((agent) => (
+                <button
+                  key={agent.id}
+                  onClick={() => router.go('hire')}
+                  className="w-full flex items-center gap-2 px-2 py-1.5 rounded-lg hover:bg-white/[0.03] transition-colors text-left group"
+                  title={agent.tasks}
+                >
+                  <div className={cn('w-5 h-5 rounded-md bg-slate-800 border border-slate-700 flex items-center justify-center text-[7px] text-slate-300 font-bold flex-shrink-0 group-hover:border-slate-500 transition-colors')}>
+                    {agent.avatar}
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <p className="text-[10px] font-medium text-slate-400 truncate group-hover:text-white transition-colors">{agent.name}</p>
+                    <p className="text-[8px] text-slate-600 truncate">{agent.title}</p>
+                  </div>
+                  <div className="w-1 h-1 rounded-full bg-emerald-500 shadow-[0_0_4px_rgba(16,185,129,0.5)]" />
+                </button>
+              ))}
+            </div>
           </div>
-          <ChevronRight className={`w-4 h-4 ${textMuted}`} />
-        </motion.div>
-      </div>
-    </motion.aside>
+        </div>
+      )}
+
+      {/* Footer / Toggle */}
+      <button
+        onClick={() => setCollapsed(!collapsed)}
+        className="flex items-center justify-center p-4 border-t border-white/5 hover:bg-white/[0.02] transition-colors text-slate-500 hover:text-slate-300 flex-shrink-0"
+      >
+        {collapsed ? <ChevronRight className="w-4 h-4" /> : <div className="flex items-center gap-2 text-[10px] font-mono"><ChevronLeft className="w-4 h-4" /> COLLAPSE</div>}
+      </button>
+    </div>
+  );
+
+  return (
+    <>
+      <aside className="hidden md:flex h-screen sticky top-0 flex-shrink-0 z-40">
+        {sidebar}
+      </aside>
+      <button
+        onClick={() => setMobileOpen(true)}
+        className="md:hidden fixed top-4 left-4 z-50 w-10 h-10 rounded-xl bg-[#0a0b12] border border-white/5 flex items-center justify-center text-white shadow-2xl"
+      >
+        <Menu className="w-5 h-5" />
+      </button>
+      <AnimatePresence>
+        {mobileOpen && (
+          <>
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+              className="md:hidden fixed inset-0 bg-black/80 z-40 backdrop-blur-sm" onClick={() => setMobileOpen(false)} />
+            <motion.div initial={{ x: -280 }} animate={{ x: 0 }} exit={{ x: -280 }}
+              transition={{ type: 'spring', bounce: 0, duration: 0.4 }}
+              className="md:hidden fixed left-0 top-0 bottom-0 w-64 z-50 flex"
+            >
+              {sidebar}
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>
+    </>
   );
 }

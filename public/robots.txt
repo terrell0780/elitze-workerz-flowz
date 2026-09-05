@@ -1,0 +1,28 @@
+# Zevanto AI Staffing Agency - Robots.txt
+# Last Updated: 2026
+
+User-agent: *
+Disallow: /admin
+Disallow: /api
+Disallow: /private
+Disallow: /*.json
+Allow: /
+
+# Crawl-delay for respectful crawling
+Crawl-delay: 1
+
+User-agent: AdsBot-Google
+Disallow:
+
+User-agent: Googlebot
+Allow: /
+Allow: /agents
+Allow: /hire
+Allow: /chat
+Allow: /pricing
+Allow: /faq
+Allow: /legal
+
+# Sitemaps
+Sitemap: https://zevanto.shop/sitemap.xml
+Sitemap: https://zevanto.shop/sitemap-blog.xml

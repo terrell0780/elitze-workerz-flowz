@@ -1,43 +1,37 @@
-import { motion } from 'framer-motion';
-import { Check } from 'lucide-react';
-import PageHeader from '../components/PageHeader';
-import { pageSEO } from '../data/seo';
+import { CheckCircle2, RefreshCcw, ShieldCheck } from 'lucide-react';
 
-interface Props { isDark: boolean; }
+const ats = ['Greenhouse', 'Lever', 'Workable', 'Ashby', 'Bullhorn'];
+const crm = ['Salesforce', 'HubSpot', 'GoHighLevel', 'Pipedrive', 'Zoho CRM'];
+const syncRules = [
+  ['System of record', 'ATS/CRM remains the owner of candidate, client, and requisition records.'],
+  ['Decision sync', 'Scores, shortlist status, approvals, rejections, and overrides are written back as structured events.'],
+  ['Transcript location', 'Chat and interview transcripts stay attached to the Zevanto audit object with exportable references.'],
+  ['Override logs', 'Manual approvals, rejects, escalation notes, and manager decisions are timestamped and retained.'],
+];
 
-export default function IntegrationsPage({ isDark }: Props) {
-  const seo = pageSEO.integrations;
-  const card = isDark ? 'bg-[#12121e] border-slate-800/60' : 'bg-white border-slate-200/60 shadow-sm';
-  const textP = isDark ? 'text-white' : 'text-slate-900';
-  const textS = isDark ? 'text-slate-400' : 'text-slate-500';
-
-  const integrations = [
-    { name: 'Slack', category: 'Communication', status: 'connected' as const, icon: '💬' },
-    { name: 'Salesforce', category: 'CRM', status: 'connected' as const, icon: '☁️' },
-    { name: 'HubSpot', category: 'Marketing', status: 'available' as const, icon: '🧡' },
-    { name: 'Zendesk', category: 'Support', status: 'connected' as const, icon: '🎧' },
-    { name: 'Jira', category: 'Project Management', status: 'available' as const, icon: '📋' },
-    { name: 'GitHub', category: 'Development', status: 'connected' as const, icon: '🐙' },
-    { name: 'Stripe', category: 'Payments', status: 'connected' as const, icon: '💳' },
-    { name: 'Notion', category: 'Documentation', status: 'available' as const, icon: '📝' },
-    { name: 'Google Workspace', category: 'Productivity', status: 'available' as const, icon: '🔵' },
-  ];
-
+export function IntegrationsPage() {
   return (
-    <div className="min-h-screen p-8">
-      <PageHeader title="Integrations" description={seo.description} breadcrumbs={seo.breadcrumbs} isDark={isDark} />
-      <div className="grid grid-cols-3 gap-5">
-        {integrations.map((int, i) => (
-          <motion.div key={int.name} className={`p-5 rounded-xl border ${card}`} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.04 }} whileHover={{ y: -3 }}>
-            <div className="flex items-start justify-between mb-4">
-              <div className={`w-12 h-12 rounded-xl flex items-center justify-center text-2xl ${isDark ? 'bg-slate-800' : 'bg-slate-100'}`}>{int.icon}</div>
-              {int.status === 'connected' && <span className="flex items-center gap-1 px-2.5 py-1 rounded-full bg-emerald-500/10 text-emerald-400 text-xs font-semibold"><Check className="w-3 h-3" /> Connected</span>}
+    <div className="min-h-screen bg-[#050608] px-6 lg:px-10 py-10">
+      <div className="max-w-6xl mx-auto">
+        <p className="text-xs font-mono text-blue-400 uppercase tracking-[0.25em] mb-3">// ATS + CRM Integrations</p>
+        <h1 className="text-4xl font-bold text-white mb-4">System-of-record sync for modern recruiting stacks</h1>
+        <p className="text-slate-400 max-w-3xl mb-10">Zevanto keeps client, candidate, agent, and decision records aligned with the systems companies already trust.</p>
+        <div className="grid md:grid-cols-2 gap-6 mb-10">
+          {[['ATS systems', ats], ['CRM systems', crm]].map(([title, list]) => (
+            <div key={title as string} className="p-6 rounded-2xl border border-white/8 bg-white/[0.02]">
+              <p className="font-bold text-white mb-4">{title as string}</p>
+              <div className="grid grid-cols-2 gap-3">
+                {(list as string[]).map((name) => <div key={name} className="flex items-center gap-2 text-sm text-slate-300"><CheckCircle2 className="w-4 h-4 text-emerald-400" />{name}</div>)}
+              </div>
             </div>
-            <h3 className={`font-bold ${textP}`}>{int.name}</h3>
-            <p className={`text-xs ${textS} mb-4`}>{int.category}</p>
-            <button className={`w-full py-2.5 rounded-xl text-sm font-semibold transition-all ${int.status === 'connected' ? isDark ? 'bg-slate-800 text-slate-300 hover:bg-slate-700' : 'bg-slate-100 text-slate-600 hover:bg-slate-200' : 'bg-gradient-to-r from-indigo-600 to-violet-600 text-white shadow-lg shadow-indigo-500/20'}`}>{int.status === 'connected' ? 'Manage' : 'Connect'}</button>
-          </motion.div>
-        ))}
+          ))}
+        </div>
+        <div className="grid lg:grid-cols-2 gap-4">
+          {syncRules.map(([title, desc]) => (
+            <div key={title} className="p-5 rounded-2xl border border-white/8 bg-white/[0.02] flex gap-4"><RefreshCcw className="w-5 h-5 text-blue-400 flex-shrink-0" /><div><p className="font-semibold text-white">{title}</p><p className="text-sm text-slate-400 mt-1">{desc}</p></div></div>
+          ))}
+        </div>
+        <div className="mt-8 p-5 rounded-2xl border border-blue-500/20 bg-blue-500/5 flex gap-3"><ShieldCheck className="w-5 h-5 text-blue-400" /><p className="text-sm text-slate-300">API wiring requires backend credentials. The frontend is ready for secure token-based integration once `VITE_API_BASE` is connected.</p></div>
       </div>
     </div>
   );
